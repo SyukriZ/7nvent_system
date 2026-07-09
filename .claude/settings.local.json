@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter doctor *)",
+      "Bash(flutter devices *)",
+      "Bash(where cloudflared *)",
+      "Bash(cloudflared --version)",
+      "Bash(powershell -Command \"Get-Process httpd -ErrorAction SilentlyContinue | Select-Object Id,Path\")",
+      "Bash(powershell -Command \"Get-Process mysqld -ErrorAction SilentlyContinue | Select-Object Id\")",
+      "PowerShell(Get-Command cloudflared -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Process httpd,mysqld -ErrorAction SilentlyContinue)",
+      "PowerShell(try { Get-Process httpd,mysqld -ErrorAction Stop | Select-Object Id,ProcessName,Path } catch { \"NOT_RUNNING: $\\($_.Exception.Message\\)\" })",
+      "Bash(grep -n \"^DocumentRoot\\\\|^<Directory\" \"C:/xampp/apache/conf/httpd.conf\" | head -20)",
+      "Bash(ls \"C:/xampp/htdocs/\" | head -30; echo \"---7nvent public---\"; ls \"C:/xampp/htdocs/7nvent/public\" 2>&1 | head -10)",
+      "Bash(ls \"C:/xampp/\" | head -30)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost/7nvent/public/)",
+      "Bash(./httpd.exe -t)",
+      "Bash(curl -L -o \"C:/xampp/htdocs/7nvent/tools/cloudflared.exe\" \"https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe\")",
+      "Bash(mkdir -p \"C:/tools\")",
+      "Bash(mv \"C:/xampp/htdocs/7nvent/tools/cloudflared.exe\" \"C:/tools/cloudflared.exe\")",
+      "Bash(\"C:/tools/cloudflared.exe\" --version)",
+      "Bash(curl -s -o /dev/null -w \"HTTP:%{http_code}\\\\n\" \"https://adventure-bra-asn-knights.trycloudflare.com/7nvent/public/\")",
+      "Bash(flutter create *)",
+      "Bash(flutter pub *)",
+      "Bash(flutter analyze *)",
+      "Bash(timeout 40 flutter run -d chrome --release)",
+      "Bash(flutter build *)",
+      "Bash(curl -s -o /dev/null -w \"Tunnel HTTP:%{http_code}\\\\n\" \"https://adventure-bra-asn-knights.trycloudflare.com/7nvent/public/\")",
+      "Bash(curl -s -o /dev/null -w \"Local HTTP:%{http_code}\\\\n\" http://localhost/7nvent/public/)",
+      "PowerShell(Start-Process -FilePath \"C:\\\\xampp\\\\apache\\\\bin\\\\httpd.exe\" -WorkingDirectory \"C:\\\\xampp\\\\apache\\\\bin\" -WindowStyle Hidden)",
+      "PowerShell(Start-Process -FilePath \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysqld.exe\" -ArgumentList \"--defaults-file=C:\\\\xampp\\\\mysql\\\\bin\\\\my.ini\" -WorkingDirectory \"C:\\\\xampp\\\\mysql\\\\bin\" -WindowStyle Hidden)",
+      "Bash(curl -s -o /dev/null -w \"Local:%{http_code} \" http://localhost/7nvent/public/)",
+      "Bash(curl -s -o /dev/null -w \"Tunnel:%{http_code}\\\\n\" \"https://adventure-bra-asn-knights.trycloudflare.com/7nvent/public/\")"
+    ]
+  }
+}

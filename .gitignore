@@ -1,0 +1,21 @@
+# ── OS / editor cruft ──
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# ── Dependencies (none checked in yet, but exclude if added later) ──
+/vendor/
+/node_modules/
+
+# ── Secrets / env (none exist as separate files yet — config/config.php
+#    is currently committed as-is per request; see note in chat) ──
+.env
+.env.*
+!.env.example
+
+# ── Logs & cache (none exist yet, but exclude if added later) ──
+*.log
+/storage/logs/
+/cache/

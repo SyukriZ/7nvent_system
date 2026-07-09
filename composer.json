@@ -1,0 +1,19 @@
+{
+    "name": "7nvent/hotel-inventory-management",
+    "description": "7NVENT - Hotel Inventory Management System (CSC2854 Final Year Project)",
+    "type": "project",
+    "require": {
+        "php": ">=8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
+    },
+    "autoload": {
+        "classmap": [
+            "app/Support/"
+        ]
+    },
+    "scripts": {
+        "test": "phpunit --testdox tests"
+    }
+}
