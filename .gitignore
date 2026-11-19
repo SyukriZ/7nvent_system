@@ -1,21 +1,29 @@
-# ── OS / editor cruft ──
+# OS and editor files
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
 *.swp
 
-# ── Dependencies (none checked in yet, but exclude if added later) ──
+# Local tooling settings
+.claude/
+
+# Dependencies
 /vendor/
 /node_modules/
 
-# ── Secrets / env (none exist as separate files yet — config/config.php
-#    is currently committed as-is per request; see note in chat) ──
+# Local configuration and secrets (copy config/config.example.php to config/config.php)
+/config/config.php
 .env
 .env.*
 !.env.example
 
-# ── Logs & cache (none exist yet, but exclude if added later) ──
+# Raw MySQL engine files: never commit these, use database/7nvent_schema.sql instead
+*.frm
+*.ibd
+db.opt
+
+# Logs and cache
 *.log
 /storage/logs/
 /cache/
