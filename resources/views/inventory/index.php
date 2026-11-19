@@ -132,28 +132,43 @@ function statusBadge(string $status): string {
 @media (prefers-reduced-motion: reduce) { .fifo-row::before { animation: none; } }
 </style>
 
+<section class="operations-intro" aria-labelledby="stock-heading">
+    <div>
+        <h2 id="stock-heading">Stock register</h2>
+        <p>Check stock across locations and compare quantities with par levels.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <button type="button" class="btn inv-action-btn btn-fifo-glass" data-bs-toggle="modal" data-bs-target="#fifoModal">
+            <i class="ph ph-arrows-clockwise me-1" aria-hidden="true"></i>FIFO Queue
+        </button>
+        <a href="<?= APP_URL ?>/inventory/create" class="btn btn-primary inv-action-btn">
+            <i class="ph ph-plus me-1" aria-hidden="true"></i>Add Item
+        </a>
+    </div>
+</section>
+
 <!-- Filters -->
 <div class="data-table mb-4 p-3 inv-filter">
     <form method="GET" action="<?= APP_URL ?>/inventory" class="d-flex flex-wrap gap-2 align-items-center">
         <div class="input-group" style="max-width:300px">
-            <input type="text" name="search" class="form-control"
+            <input type="text" name="search" class="form-control" aria-label="Search by item or location"
                    placeholder="Search items by name or location..."
                    value="<?= clean($_GET['search'] ?? '') ?>">
-            <button class="btn btn-outline-secondary" type="submit"><i class="ph-bold ph-magnifying-glass"></i></button>
+            <button class="btn btn-outline-secondary" type="submit" aria-label="Search inventory"><i class="ph-bold ph-magnifying-glass"></i></button>
         </div>
-        <select name="category" class="form-select" style="max-width:175px" onchange="this.form.submit()">
+        <select name="category" aria-label="Filter by category" class="form-select" style="max-width:175px" onchange="this.form.submit()">
             <option value="">All Categories</option>
             <?php foreach(['Toiletries','F&B','Linens','Cleaning','Minibar'] as $c): ?>
                 <option value="<?= $c ?>" <?= ($_GET['category']??'')===$c?'selected':'' ?>><?= $c ?></option>
             <?php endforeach; ?>
         </select>
-        <select name="location" class="form-select" style="max-width:200px" onchange="this.form.submit()">
+        <select name="location" aria-label="Filter by location" class="form-select" style="max-width:200px" onchange="this.form.submit()">
             <option value="">All Locations</option>
             <?php foreach($locations as $loc): ?>
                 <option value="<?= $loc['location_id'] ?>" <?= ($_GET['location']??'')==$loc['location_id']?'selected':'' ?>><?= clean($loc['location_name']) ?></option>
             <?php endforeach; ?>
         </select>
-        <select name="status" class="form-select" style="max-width:160px" onchange="this.form.submit()">
+        <select name="status" aria-label="Filter by status" class="form-select" style="max-width:160px" onchange="this.form.submit()">
             <option value="">All Status</option>
             <?php foreach(['In-Stock','Low Stock','Out of Stock'] as $s): ?>
                 <option value="<?= $s ?>" <?= ($_GET['status']??'')===$s?'selected':'' ?>><?= $s ?></option>
@@ -163,32 +178,26 @@ function statusBadge(string $status): string {
             <a href="<?= APP_URL ?>/inventory" class="btn btn-outline-danger"><i class="ph-bold ph-x me-1"></i>Clear</a>
         <?php endif; ?>
 
-        <!-- Buttons: FIFO Queue + Add Item -->
-        <div class="d-flex gap-2 ms-auto">
-            <button type="button" class="btn inv-action-btn btn-fifo-glass"
-                    data-bs-toggle="modal" data-bs-target="#fifoModal">
-                <i class="ph-fill ph-arrows-clockwise me-1"></i>FIFO Queue
-            </button>
-            <a href="<?= APP_URL ?>/inventory/create" class="btn btn-primary inv-action-btn">
-                <i class="ph-bold ph-plus me-1"></i>Add Item
-            </a>
-        </div>
     </form>
 </div>
 
 <!-- Inventory Table -->
-<div class="data-table">
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h3 id="inventory-results" class="h6 mb-0">Inventory items</h3>
+    <span class="small text-body-secondary"><?= count($items) ?> found</span>
+</div>
+<div class="data-table inventory-scroll" role="region" tabindex="0" aria-labelledby="inventory-results">
     <table class="table table-hover mb-0 inv-table">
         <thead>
             <tr>
-                <th class="ps-4"><i class="ph ph-cube me-1"></i>ITEM NAME</th>
-                <th class="text-center"><i class="ph ph-tag me-1"></i>CATEGORY</th>
-                <th class="text-center"><i class="ph ph-map-pin me-1"></i>LOCATION</th>
-                <th class="text-center"><i class="ph ph-stack me-1"></i>QUANTITY</th>
-                <th class="text-center"><i class="ph ph-chart-bar me-1"></i>PAR LEVEL</th>
-                <th class="text-center"><i class="ph ph-check-circle me-1"></i>STATUS</th>
-                <th class="text-center"><i class="ph ph-calendar me-1"></i>EXPIRY</th>
-                <th class="text-center"><i class="ph ph-gear me-1"></i>ACTIONS</th>
+                <th scope="col" class="ps-4"><i class="ph ph-cube me-1"></i>ITEM NAME</th>
+                <th scope="col" class="text-center"><i class="ph ph-tag me-1"></i>CATEGORY</th>
+                <th scope="col" class="text-center"><i class="ph ph-map-pin me-1"></i>LOCATION</th>
+                <th scope="col" class="text-center"><i class="ph ph-stack me-1"></i>QUANTITY</th>
+                <th scope="col" class="text-center"><i class="ph ph-chart-bar me-1"></i>PAR LEVEL</th>
+                <th scope="col" class="text-center"><i class="ph ph-check-circle me-1"></i>STATUS</th>
+                <th scope="col" class="text-center"><i class="ph ph-calendar me-1"></i>EXPIRY</th>
+                <th scope="col" class="text-center"><i class="ph ph-gear me-1"></i>ACTIONS</th>
             </tr>
         </thead>
         <tbody>
@@ -210,17 +219,17 @@ function statusBadge(string $status): string {
                     ?>
                     <div style="min-width:120px;margin:0 auto">
                         <div style="line-height:1">
-                            <span class="qty-num" data-target="<?= $qty ?>"
-                                  style="font-size:18px;font-weight:800;color:<?= $color ?>">0</span>
+                            <span class="qty-num"
+                                  style="font-size:18px;font-weight:800;color:var(--text-primary)"><?= number_format($qty) ?></span>
                             <span style="font-size:11px;font-weight:500;color:var(--text-faint)"> units</span>
                         </div>
                         <div class="qty-bar-track" style="margin-top:5px;height:6px">
-                            <div class="qty-bar" data-pct="<?= $pct ?>"
-                                 style="width:0%;height:100%;background:<?= $color ?>;border-radius:4px;
+                            <div class="qty-bar"
+                                 style="width:<?= $pct ?>%;height:100%;background:<?= $color ?>;border-radius:4px;
                                         transition:width 1.2s cubic-bezier(0.25,0.46,0.45,0.94)"></div>
                         </div>
                         <div style="font-size:10px;color:var(--text-faint);margin-top:2px">
-                            <span class="qty-pct" data-pct="<?= $pct ?>">0</span>% of par
+                            <span class="qty-pct"><?= $pct ?></span>% of par
                         </div>
                     </div>
                 </td>
@@ -233,19 +242,19 @@ function statusBadge(string $status): string {
                         <?= $item['expiry_date'] ? date('M Y', strtotime($item['expiry_date'])) : 'N/A' ?>
                     </span>
                 </td>
-                <td class="text-center">
+                <td class="text-center text-nowrap">
                     <?php if (Auth::hasRole('Inventory Manager', 'Housekeeping Manager')): ?>
                     <a href="<?= APP_URL ?>/inventory/edit?id=<?= $item['item_id'] ?>"
-                       class="btn btn-primary inv-action-btn">
-                       <i class="ph-bold ph-pencil-simple me-1"></i>Edit
+                       class="btn btn-outline-secondary inv-action-btn">
+                       <i class="ph-bold ph-pencil-simple me-1" aria-hidden="true"></i>Edit
                     </a>
                     <?php endif; ?>
                     <?php if (Auth::hasRole('Inventory Manager')): ?>
                     <form method="POST" action="<?= APP_URL ?>/inventory/delete"
                           class="d-inline" onsubmit="return confirm('Delete this item?')">
                         <input type="hidden" name="item_id" value="<?= $item['item_id'] ?>">
-                        <button type="submit" class="btn btn-outline-danger inv-action-btn">
-                            <i class="ph-bold ph-trash me-1"></i>Del
+                        <button type="submit" class="btn btn-outline-danger inv-action-btn ms-1">
+                            <i class="ph-bold ph-trash me-1" aria-hidden="true"></i>Delete
                         </button>
                     </form>
                     <?php endif; ?>
@@ -265,27 +274,23 @@ function statusBadge(string $status): string {
         </tbody>
     </table>
 </div>
-<div class="mt-2 ps-1" style="font-size:14px;color:var(--text-muted)">
-    <i class="ph ph-list-dashes me-1"></i><?= count($items) ?> item(s) found
-</div>
-
 <!-- ═══════════════════════════════════════════════════════════
      FIFO ENFORCEMENT MODAL
      Perishable items sorted by expiry date (oldest first)
      ═══════════════════════════════════════════════════════════ -->
-<div class="modal fade" id="fifoModal" tabindex="-1">
+<div class="modal fade" id="fifoModal" tabindex="-1" aria-labelledby="fifoTitle">
 <div class="modal-dialog modal-lg modal-dialog-scrollable">
 <div class="modal-content" style="border-radius:16px;border:none;overflow:hidden">
 
     <!-- Header -->
-    <div class="modal-header" style="background:linear-gradient(135deg,#0096FF,#6366f1);border:none;padding:20px 24px">
+    <div class="modal-header" style="background:var(--forest);border:none;padding:20px 24px">
         <div>
-            <h5 class="modal-title text-white fw-bold mb-0"><i class="ph-fill ph-arrows-clockwise me-2"></i>FIFO Enforcement Queue</h5>
+            <h2 id="fifoTitle" class="modal-title h5 text-white fw-bold mb-0"><i class="ph-fill ph-arrows-clockwise me-2"></i>FIFO Enforcement Queue</h2>
             <div style="font-size:12px;color:rgba(255,255,255,.75);margin-top:3px">
                 Items sorted by expiry date — consume oldest stock first
             </div>
         </div>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close FIFO queue"></button>
     </div>
 
     <div class="modal-body p-0">
@@ -293,29 +298,29 @@ function statusBadge(string $status): string {
         <!-- Compliance Dashboard -->
         <div class="fifo-dash" style="padding:18px 24px">
             <div class="row g-3 mb-3">
-                <div class="col-3 text-center">
+                <div class="col-6 col-sm-3 text-center">
                     <div id="fifoScore"
                          style="font-size:30px;font-weight:900;
                                 color:<?= $fifoCompliance>=80?'#22c55e':($fifoCompliance>=60?'#f59e0b':'#ef4444') ?>">
-                        0%
+                        <?= (int)$fifoCompliance ?>%
                     </div>
                     <div style="font-size:9px;color:var(--text-faint);font-weight:700;text-transform:uppercase;letter-spacing:.5px">
                         FIFO Compliance
                     </div>
                 </div>
-                <div class="col-3 text-center">
+                <div class="col-6 col-sm-3 text-center">
                     <div style="font-size:24px;font-weight:900;color:var(--text-primary)"><?= $totalPerishable ?></div>
                     <div style="font-size:9px;color:var(--text-faint);font-weight:700;text-transform:uppercase;letter-spacing:.5px">
                         Perishable Items
                     </div>
                 </div>
-                <div class="col-3 text-center">
+                <div class="col-6 col-sm-3 text-center">
                     <div style="font-size:24px;font-weight:900;color:#ef4444"><?= $expiredCount ?></div>
                     <div style="font-size:9px;color:var(--text-faint);font-weight:700;text-transform:uppercase;letter-spacing:.5px">
                         Expired
                     </div>
                 </div>
-                <div class="col-3 text-center">
+                <div class="col-6 col-sm-3 text-center">
                     <?php
                     $urgentCount = 0;
                     foreach ($fifoItems as $f) {
@@ -333,7 +338,7 @@ function statusBadge(string $status): string {
             <!-- Compliance bar -->
             <div style="background:var(--border-color);border-radius:6px;height:10px;overflow:hidden;margin-bottom:8px">
                 <div id="fifoBar"
-                     style="width:0%;height:100%;border-radius:6px;transition:width 1.4s ease;
+                     style="width:<?= (int)$fifoCompliance ?>%;height:100%;border-radius:6px;
                             background:<?= $fifoCompliance>=80
                                 ? 'linear-gradient(90deg,#22c55e,#16a34a)'
                                 : ($fifoCompliance>=60
@@ -458,62 +463,6 @@ function statusBadge(string $status): string {
 </div>
 </div>
 </div>
-
-<script>
-window.addEventListener('load', function() {
-    // Animate quantity numbers
-    document.querySelectorAll('.qty-num').forEach(function(el) {
-        const target = parseInt(el.dataset.target) || 0;
-        if (target === 0) { el.textContent = '0'; return; }
-        const duration = 1200;
-        const startTime = performance.now();
-        function update(now) {
-            const progress = Math.min((now - startTime) / duration, 1);
-            const ease = 1 - Math.pow(1 - progress, 3);
-            el.textContent = Math.floor(ease * target).toLocaleString();
-            if (progress < 1) requestAnimationFrame(update);
-            else el.textContent = target.toLocaleString();
-        }
-        requestAnimationFrame(update);
-    });
-
-    // Animate progress bars and pct text
-    requestAnimationFrame(function() { requestAnimationFrame(function() {
-        document.querySelectorAll('.qty-bar').forEach(function(bar) {
-            bar.style.width = bar.dataset.pct + '%';
-        });
-        document.querySelectorAll('.qty-pct').forEach(function(el) {
-            const target = parseInt(el.dataset.pct) || 0;
-            let count = 0;
-            const step = Math.max(1, Math.ceil(target / 40));
-            const interval = setInterval(function() {
-                count += step;
-                if (count >= target) { count = target; clearInterval(interval); }
-                el.textContent = count;
-            }, 30);
-        });
-    }); });
-});
-
-// Animate FIFO score + bar when modal opens
-document.getElementById('fifoModal').addEventListener('shown.bs.modal', function() {
-    const target  = <?= (int)$fifoCompliance ?>;
-    const scoreEl = document.getElementById('fifoScore');
-    const bar     = document.getElementById('fifoBar');
-
-    if (bar) setTimeout(function() { bar.style.width = target + '%'; }, 100);
-
-    if (scoreEl) {
-        let c = 0;
-        const step = Math.max(1, Math.ceil(target / 40));
-        const iv = setInterval(function() {
-            c = Math.min(c + step, target);
-            scoreEl.textContent = c + '%';
-            if (c >= target) clearInterval(iv);
-        }, 25);
-    }
-});
-</script>
 
 <?php
 $content = ob_get_clean();
