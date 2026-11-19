@@ -509,8 +509,9 @@
         }
 
     </style>
+    <link rel="stylesheet" href="<?= APP_URL ?>/assets/hospitality.css">
 </head>
-<body>
+<body class="hospitality-app">
 
 <!-- Eye Protection Mode overlay — sits above everything, never blocks clicks -->
 <div id="eyeProtectOverlay"></div>
@@ -519,40 +520,36 @@
 $currentUser = Auth::user();
 $flash = flash();
 $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$basePath = parse_url(APP_URL, PHP_URL_PATH);
-$currentRoute = str_replace($basePath, '', $currentPath);
+$basePath = rtrim(parse_url(APP_URL, PHP_URL_PATH) ?? '', '/');
+$currentRoute = substr($currentPath, strlen($basePath));
 
-function isActive(string $path): string {
-    global $currentRoute;
-    return ($currentRoute === $path || strpos($currentRoute, $path) === 0) ? 'active' : '';
-}
+$isActive = static fn (string $path): bool => $currentRoute === $path || str_starts_with($currentRoute, $path . '/');
 ?>
 
-<!-- ======= LIQUID GLASS AMBIENT BACKGROUND ======= -->
-<div id="glassAmbient" aria-hidden="true">
-    <span class="g-blob g-blob-1"></span>
-    <span class="g-blob g-blob-2"></span>
-    <span class="g-blob g-blob-3"></span>
+<div class="mobile-navigation d-lg-none">
+    <button type="button" class="btn btn-sm btn-outline-secondary" id="nav-toggle"
+            aria-controls="sidebar" aria-expanded="false">
+        <i class="bi bi-list" aria-hidden="true"></i> Menu
+    </button>
 </div>
 
-<!-- ======= SIDEBAR ======= -->
-<div id="sidebar" class="liquid-glass">
+<nav id="sidebar" aria-label="Workspace navigation">
     <div class="sidebar-brand">
-        <div class="brand-logo"><span>7</span>NVENT</div>
+        <div class="brand-wordmark"><span>7</span>NVENT</div>
         <div class="brand-sub">Hotel Inventory System</div>
     </div>
 
-    <div class="sidebar-section">Main</div>
-    <a href="<?= APP_URL ?>/dashboard" class="<?= isActive('/dashboard') ?>">
+    <div class="sidebar-section">Operations</div>
+    <a href="<?= APP_URL ?>/dashboard" <?php if ($isActive('/dashboard')): ?>class="active" aria-current="page"<?php endif; ?>>
         <i class="ph ph-gauge"></i> Dashboard
     </a>
-    <a href="<?= APP_URL ?>/inventory" class="<?= isActive('/inventory') ?>">
+    <a href="<?= APP_URL ?>/inventory" <?php if ($isActive('/inventory')): ?>class="active" aria-current="page"<?php endif; ?>>
         <i class="ph ph-package"></i> Inventory
     </a>
-    <a href="<?= APP_URL ?>/purchase-orders" class="<?= isActive('/purchase-orders') ?>">
+    <a href="<?= APP_URL ?>/purchase-orders" <?php if ($isActive('/purchase-orders')): ?>class="active" aria-current="page"<?php endif; ?>>
         <i class="ph ph-receipt"></i> Purchase Orders
     </a>
-    <a href="<?= APP_URL ?>/alerts" class="<?= isActive('/alerts') ?>">
+    <a href="<?= APP_URL ?>/alerts" <?php if ($isActive('/alerts')): ?>class="active" aria-current="page"<?php endif; ?>>
         <i class="ph ph-bell"></i> Alerts
         <?php
         $alertCount = db()->fetchOne("SELECT COUNT(*) as cnt FROM alerts WHERE status='Active' AND alert_type='Critical'")['cnt'] ?? 0;
@@ -562,27 +559,27 @@ function isActive(string $path): string {
     </a>
 
     <div class="sidebar-section">Management</div>
-    <a href="<?= APP_URL ?>/suppliers" class="<?= isActive('/suppliers') ?>">
+    <a href="<?= APP_URL ?>/suppliers" <?php if ($isActive('/suppliers')): ?>class="active" aria-current="page"<?php endif; ?>>
         <i class="ph ph-truck"></i> Suppliers
     </a>
-    <a href="<?= APP_URL ?>/locations" class="<?= isActive('/locations') ?>">
+    <a href="<?= APP_URL ?>/locations" <?php if ($isActive('/locations')): ?>class="active" aria-current="page"<?php endif; ?>>
         <i class="ph ph-map-pin"></i> Locations
     </a>
-    <a href="<?= APP_URL ?>/reports" class="<?= isActive('/reports') ?>">
+    <a href="<?= APP_URL ?>/reports" <?php if ($isActive('/reports')): ?>class="active" aria-current="page"<?php endif; ?>>
         <i class="ph ph-chart-line"></i> Reports
     </a>
 
     <div class="sidebar-section">System</div>
-    <a href="<?= APP_URL ?>/users" class="<?= isActive('/users') ?>">
+    <a href="<?= APP_URL ?>/users" <?php if ($isActive('/users')): ?>class="active" aria-current="page"<?php endif; ?>>
         <i class="ph ph-users"></i> Users & Roles
     </a>
-    <a href="<?= APP_URL ?>/qr-scanner" class="<?= isActive('/qr-scanner') ?>">
+    <a href="<?= APP_URL ?>/qr-scanner" <?php if ($isActive('/qr-scanner')): ?>class="active" aria-current="page"<?php endif; ?>>
         <i class="ph ph-barcode"></i> QR Scanner
     </a>
-    <a href="<?= APP_URL ?>/settings" class="<?= isActive('/settings') ?>">
+    <a href="<?= APP_URL ?>/settings" <?php if ($isActive('/settings')): ?>class="active" aria-current="page"<?php endif; ?>>
         <i class="ph ph-gear"></i> Settings
     </a>
-    <a href="<?= APP_URL ?>/analytics" class="<?= isActive('/analytics') ?>">
+    <a href="<?= APP_URL ?>/analytics" <?php if ($isActive('/analytics')): ?>class="active" aria-current="page"<?php endif; ?>>
         <i class="ph ph-chart-line-up"></i> Analytics
     </a>
     <a href="#" id="exitBtn" onclick="showLogoutModal(event)">
@@ -596,7 +593,7 @@ function isActive(string $path): string {
             <div class="user-role"><?= clean($currentUser['role_name'] ?? '') ?></div>
         </div>
     </div>
-</div>
+</nav>
 
 <!-- ======= LOGOUT CONFIRMATION MODAL ======= -->
 
@@ -1354,9 +1351,9 @@ function escHandler(e) {
 </script>
 
 <!-- ======= MAIN CONTENT ======= -->
-<div id="main-content">
-    <div class="top-header liquid-glass">
-        <div class="page-title"><?= $pageTitle ?? 'Dashboard' ?></div>
+<main id="main-content">
+    <header class="top-header">
+        <h1 class="page-title"><?= $pageTitle ?? 'Dashboard' ?></h1>
         <div class="d-flex align-items-center gap-3">
 
             <!-- ===== Utility Toggle Group: Help / Language / Text Size ===== -->
@@ -1386,12 +1383,12 @@ function escHandler(e) {
                 </button>
             </div>
 
-            <span class="text-muted small"><?= date('d M Y, H:i') ?></span>
+            <span class="text-muted small d-none d-md-inline"><?= date('d M Y, H:i') ?></span>
             <div class="user-avatar" style="width:32px;height:32px;font-size:11px">
                 <?= strtoupper(substr($currentUser['full_name'] ?? 'U', 0, 2)) ?>
             </div>
         </div>
-    </div>
+    </header>
 
     <?php if ($flash): ?>
         <div class="flash-alert alert alert-<?= $flash['type'] === 'success' ? 'success' : 'danger' ?> alert-dismissible fade show" role="alert">
@@ -1410,7 +1407,7 @@ function escHandler(e) {
     <div class="content-area">
         <?= $content ?? '' ?>
     </div>
-</div>
+</main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <?php if (isset($extraJs)): ?>
@@ -1418,29 +1415,18 @@ function escHandler(e) {
 <?php endif; ?>
 
 <script>
-// Auto-detect active sidebar item based on current URL
-(function() {
-    const path = window.location.pathname;
-    const links = document.querySelectorAll('#sidebar a');
-    let bestMatch = null;
-    let bestLen = 0;
-
-    links.forEach(link => {
-        link.classList.remove('active');
-        const href = link.getAttribute('href');
-        if (!href || href.includes('logout')) return;
-        try {
-            const url = new URL(href, window.location.origin);
-            const linkPath = url.pathname;
-            if (linkPath !== '/' && path.startsWith(linkPath) && linkPath.length > bestLen) {
-                bestLen = linkPath.length;
-                bestMatch = link;
-            }
-        } catch(e) {}
-    });
-
-    if (bestMatch) bestMatch.classList.add('active');
-})();
+const navToggle = document.getElementById('nav-toggle');
+const workspaceNav = document.getElementById('sidebar');
+navToggle.addEventListener('click', () => {
+    navToggle.setAttribute('aria-expanded', String(workspaceNav.classList.toggle('show')));
+});
+workspaceNav.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && workspaceNav.classList.contains('show') && navToggle.offsetWidth) {
+        workspaceNav.classList.remove('show');
+        navToggle.setAttribute('aria-expanded', 'false');
+        navToggle.focus();
+    }
+});
 </script>
 <!-- ======= THEME (LIGHT/DARK) & EYE PROTECTION ======= -->
 <script>

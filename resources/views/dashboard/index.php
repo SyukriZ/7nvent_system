@@ -4,61 +4,9 @@ ob_start();
 ?>
 
 <style>
-/* ======= DASHBOARD ANIMATIONS ======= */
-
-/* Card slide-in */
-.dash-card {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: cardSlideIn 0.5s ease forwards;
-}
-@keyframes cardSlideIn {
-    to { opacity:1; transform:translateY(0); }
-}
-
-/* Skeleton shimmer */
-.skeleton {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.2s infinite;
-    border-radius: 6px;
-}
-@keyframes shimmer {
-    0%   { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-}
-
-/* Progress bar animation */
-.prog-bar-anim {
-    width: 0%;
-    transition: width 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* KPI pulse after count */
-@keyframes kpiPulse {
-    0%  { transform:scale(1); }
-    50% { transform:scale(1.05); }
-    100%{ transform:scale(1); }
-}
-.kpi-pulse { animation: kpiPulse 0.4s ease; }
-
 /* Refresh spin */
 @keyframes spin { 100%{ transform:rotate(360deg); } }
 .spin { animation: spin 0.6s linear; }
-
-/* Activity item slide in */
-.activity-item {
-    opacity: 0;
-    transform: translateX(-10px);
-    animation: slideRight 0.4s ease forwards;
-}
-@keyframes slideRight { to { opacity:1; transform:translateX(0); } }
-
-/* Status indicator pulse */
-@keyframes statusPulse {
-    0%,100% { box-shadow: 0 0 0 0 currentColor; }
-    50%     { box-shadow: 0 0 0 4px transparent; }
-}
 
 /* Refresh button */
 .refresh-btn {
@@ -70,20 +18,23 @@ ob_start();
 .refresh-btn:hover { background: var(--bg-subtle); color:#0096FF; border-color:#0096FF; }
 </style>
 
-<!-- ======= KPI Stats Row ======= -->
+<section class="operations-intro operations-intro--dashboard" aria-labelledby="operations-heading">
+    <div>
+        <h2 id="operations-heading">Hotel operations overview</h2>
+        <p>Review stock, pending orders, and alerts for your next shift.</p>
+    </div>
+    <a class="btn fw-semibold" href="<?= APP_URL ?>/inventory">View inventory <i class="ph ph-arrow-right ms-1" aria-hidden="true"></i></a>
+</section>
+
+<!-- KPI statistics -->
 <div class="row g-3 mb-4">
     <div class="col-md-4">
         <div class="stat-card dash-card" style="animation-delay:0.05s">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-label"><i class="ph-fill ph-package me-1"></i>Total Items in Stock</div>
-                    <div class="stat-value" id="kpi-total" data-target="<?= $data['totalStock'] ?>">0</div>
+                    <div class="stat-value" id="kpi-total"><?= number_format($data['totalStock']) ?></div>
                 </div>
-                <span style="background:#dcfce7;color:#16a34a;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px"><i class="ph-fill ph-trend-up me-1"></i>+3.2%</span>
-            </div>
-            <!-- Mini sparkline -->
-            <div style="height:3px;background: var(--border-color);border-radius:2px;margin-top:12px;overflow:hidden">
-                <div id="spark1" style="height:100%;width:0%;background:#22c55e;border-radius:2px;transition:width 1.8s ease"></div>
             </div>
         </div>
     </div>
@@ -92,12 +43,9 @@ ob_start();
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-label"><i class="ph-fill ph-receipt me-1"></i>Pending Order Value</div>
-                    <div class="stat-value" id="kpi-pov" data-target="<?= (float)$data['pendingPOValue'] ?>">RM 0.00</div>
+                    <div class="stat-value" id="kpi-pov"><?= 'RM ' . number_format($data['pendingPOValue'], 2) ?></div>
                 </div>
                 <span style="background:#fef9c3;color:#b45309;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px"><i class="ph-fill ph-clock me-1"></i>Pending</span>
-            </div>
-            <div style="height:3px;background: var(--border-color);border-radius:2px;margin-top:12px;overflow:hidden">
-                <div id="spark2" style="height:100%;width:0%;background:#f59e0b;border-radius:2px;transition:width 2s ease"></div>
             </div>
         </div>
     </div>
@@ -106,12 +54,9 @@ ob_start();
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-label"><i class="ph-fill ph-warning-octagon me-1"></i>Critical Alerts</div>
-                    <div class="stat-value text-danger" id="kpi-alerts" data-target="<?= $data['criticalAlerts'] ?>">0</div>
+                    <div class="stat-value text-danger" id="kpi-alerts"><?= number_format($data['criticalAlerts']) ?></div>
                 </div>
                 <span style="background:#fee2e2;color:#dc2626;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px"><i class="ph-fill ph-warning me-1"></i>Critical</span>
-            </div>
-            <div style="height:3px;background: var(--border-color);border-radius:2px;margin-top:12px;overflow:hidden">
-                <div id="spark3" style="height:100%;width:0%;background:#ef4444;border-radius:2px;transition:width 1.5s ease"></div>
             </div>
         </div>
     </div>
@@ -122,15 +67,15 @@ ob_start();
     <div class="col-md-6">
         <div class="stat-card h-100 dash-card" style="animation-delay:0.35s">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="fw-bold"><i class="ph-fill ph-chart-bar me-1"></i>Weekly Consumption (Units)</div>
+                <div class="fw-bold"><i class="ph-fill ph-chart-bar me-1"></i>Latest recorded usage by weekday</div>
                 <div class="d-flex align-items-center gap-2">
-                    <span style="background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px"><i class="ph-fill ph-calendar me-1"></i>Today</span>
-                    <button class="refresh-btn" onclick="refreshChart(this)" title="Refresh chart">
+                    <span style="background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px"><i class="ph-fill ph-calendar me-1"></i>Units</span>
+                    <button class="refresh-btn" onclick="refreshChart(this)" title="Redraw chart" aria-label="Redraw consumption chart">
                         <i class="ph ph-arrows-clockwise" id="refreshIcon"></i>
                     </button>
                 </div>
             </div>
-            <canvas id="weeklyChart" height="120"></canvas>
+            <canvas id="weeklyChart" height="120" role="img" aria-label="Stock consumption by weekday: <?= clean(implode(', ', array_map(static fn ($day) => $day['day'] . ' ' . $day['units'] . ' units', $data['weeklyConsumption']))) ?>"></canvas>
         </div>
     </div>
 
@@ -141,29 +86,19 @@ ob_start();
                 <span style="font-size:11px;color:var(--text-faint)">by category</span>
             </div>
             <?php
-            $catColors = [
-                'Toiletries' => '#3b82f6',
-                'Linens'     => '#ef4444',
-                'F&B'        => '#8b5cf6',
-                'Minibar'    => '#f59e0b',
-                'Cleaning'   => '#22c55e',
-            ];
-            foreach ($data['categoryStock'] as $i => $cat):
+            foreach ($data['categoryStock'] as $cat):
                 $pct   = min((int)$cat['pct'], 100);
-                $color = $catColors[$cat['category']] ?? 'var(--text-muted)';
+                $color = $pct < 30 ? '#b94443' : ($pct < 60 ? '#b28843' : '#48826b');
                 $warn  = $pct < 30 ? 'text-danger fw-bold' : ($pct < 60 ? 'text-warning fw-bold' : '');
             ?>
             <div class="mb-3">
                 <div class="d-flex justify-content-between small mb-1">
                     <span><i class="ph ph-tag me-1"></i><?= clean($cat['category']) ?></span>
-                    <span class="<?= $warn ?>" id="pct-<?= $i ?>">0%</span>
+                    <span class="<?= $warn ?>"><?= $pct ?>%</span>
                 </div>
                 <div class="progress" style="height:8px;border-radius:4px;background: var(--border-subtle)">
-                    <div class="progress-bar prog-bar-anim"
-                         id="bar-<?= $i ?>"
-                         data-target="<?= $pct ?>"
-                         data-color="<?= $color ?>"
-                         style="background:<?= $color ?>;border-radius:4px;width:0%">
+                    <div class="progress-bar"
+                         style="background:<?= $color ?>;border-radius:4px;width:<?= $pct ?>%">
                     </div>
                 </div>
             </div>
@@ -270,65 +205,10 @@ $weeklyLabels = json_encode(array_column($data['weeklyConsumption'], 'day'));
 $weeklyValues = json_encode(array_column($data['weeklyConsumption'], 'units'));
 // Mon=0, Tue=1, Wed=2, Thu=3, Fri=4, Sat=5, Sun=6
 $todayIndex   = (int)date('N') - 1;
-$catCount     = count($data['categoryStock']);
-
 $extraJs = "
-// ======= COUNTER ANIMATION (GSAP) =======
-function animateCounter(el, target, prefix, suffix, duration) {
-    const obj = { val: 0 };
-    gsap.to(obj, {
-        val: target,
-        duration: duration / 1000,
-        ease: 'power3.out',
-        onUpdate: function() {
-            const current = Math.floor(obj.val);
-            if (prefix === 'RM ') {
-                el.textContent = 'RM ' + current.toLocaleString('en-MY', {minimumFractionDigits:2, maximumFractionDigits:2});
-            } else {
-                el.textContent = prefix + current.toLocaleString() + suffix;
-            }
-        },
-        onComplete: function() {
-            gsap.fromTo(el, { scale: 1.08 }, { scale: 1, duration: 0.25, ease: 'back.out(2)' });
-        }
-    });
-}
-
-// ======= PROGRESS BAR ANIMATION (GSAP) =======
-function animateBars() {
-    for (let i = 0; i < $catCount; i++) {
-        const bar = document.getElementById('bar-' + i);
-        const pctEl = document.getElementById('pct-' + i);
-        if (!bar) continue;
-        const target = parseInt(bar.dataset.target);
-        const counterObj = { val: 0 };
-
-        gsap.to(bar, {
-            width: target + '%',
-            duration: 1.1,
-            ease: 'power2.out',
-            delay: 0.4 + i * 0.18,
-        });
-        gsap.to(counterObj, {
-            val: target,
-            duration: 1.1,
-            delay: 0.4 + i * 0.18,
-            ease: 'power2.out',
-            onUpdate: function() { pctEl.textContent = Math.round(counterObj.val) + '%'; }
-        });
-    }
-}
-
-// ======= SPARKLINES (GSAP) =======
-function animateSparklines() {
-    gsap.to('#spark1', { width: '72%', duration: 0.9, delay: 0.4, ease: 'power2.out' });
-    gsap.to('#spark2', { width: '58%', duration: 0.9, delay: 0.5, ease: 'power2.out' });
-    gsap.to('#spark3', { width: '35%', duration: 0.9, delay: 0.6, ease: 'power2.out' });
-}
-
 // ======= CHART =======
 const todayIndex = $todayIndex;
-const barColors  = $weeklyLabels.map((d, i) => i === todayIndex ? '#0096FF' : '#f59e0b');
+const barColors  = $weeklyLabels.map((d, i) => i === todayIndex ? '#287355' : '#b69862');
 
 // Theme-aware chart colors (canvas can't resolve CSS var() directly)
 function dashChartTheme() {
@@ -341,6 +221,7 @@ function dashChartTheme() {
 
 let chartInstance;
 function buildChart(values) {
+    if (typeof Chart === 'undefined') return;
     const ctxEl = document.getElementById('weeklyChart').getContext('2d');
     if (chartInstance) chartInstance.destroy();
     chartInstance = new Chart(ctxEl, {
@@ -356,16 +237,12 @@ function buildChart(values) {
         },
         options: {
             responsive: true,
-            animation: {
-                duration: 1200,
-                easing: 'easeOutBounce',
-                delay: (ctx) => ctx.dataIndex * 80,
-            },
+            animation: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? false : { duration: 350 },
             plugins: {
                 legend: { display:false },
                 tooltip: {
                     callbacks: {
-                        label: (ctx) => ctx.parsed.y + ' units' + (ctx.dataIndex === todayIndex ? ' (Today)' : '')
+                        label: (ctx) => ctx.parsed.y + ' units'
                     }
                 }
             },
@@ -373,12 +250,12 @@ function buildChart(values) {
                 y: {
                     beginAtZero: true,
                     grid: { color: dashChartTheme().gridColor },
-                    animation: { duration: 1000 }
+                    ticks: { color: dashChartTheme().tickColor }
                 },
                 x: {
                     grid: { display:false },
                     ticks: {
-                        color: (ctx) => ctx.index === todayIndex ? '#0096FF' : dashChartTheme().tickColor,
+                        color: (ctx) => ctx.index === todayIndex ? '#367c65' : dashChartTheme().tickColor,
                         font:  (ctx) => ({ weight: ctx.index === todayIndex ? 'bold' : 'normal' })
                     }
                 }
@@ -399,19 +276,6 @@ function refreshChart(btn) {
     }, 600);
 }
 
-// ======= RUN ALL ON LOAD =======
-window.addEventListener('load', () => {
-    // KPI counters — stagger
-    setTimeout(() => animateCounter(document.getElementById('kpi-total'),  parseInt(document.getElementById('kpi-total').dataset.target),  '', '', 1400), 200);
-    setTimeout(() => animateCounter(document.getElementById('kpi-pov'),    parseFloat(document.getElementById('kpi-pov').dataset.target),   'RM ', '', 1600), 350);
-    setTimeout(() => animateCounter(document.getElementById('kpi-alerts'), parseInt(document.getElementById('kpi-alerts').dataset.target), '', '', 800),  500);
-
-    // Progress bars
-    animateBars();
-
-    // Sparklines
-    animateSparklines();
-});
 ";
 
 require_once __DIR__ . '/../layouts/app.php';
